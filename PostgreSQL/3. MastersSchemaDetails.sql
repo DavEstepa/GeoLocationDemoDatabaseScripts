@@ -16,6 +16,39 @@ CREATE TABLE IF NOT EXISTS masters.Lists (
   FOREIGN KEY (IdTypeOfList) REFERENCES masters.TypeOfLists (Id)
 );
 
+--VIEWS DEFINITIONS
+
+CREATE VIEW masters.ListsView AS
+SELECT ML.Id,
+       ML.MessageToShow,
+       ML.Code,
+       MTOL.Code AS TypeOfListCode,
+       MTOL.TypeOfListValue,
+       ML.DateCreated
+FROM masters.Lists AS ML
+INNER JOIN masters.TypeOfLists AS MTOL
+ON ML.IdTypeOfList = MTOL.Id;
+
+
+--STORED PROCEDURES DEFINITIONS
+
+CREATE OR REPLACE PROCEDURE masters.sp_get_list_by_typelistcode(
+  TypeOfListCodeValue VARCHAR(50),
+  OUT p_result refcursor
+  )
+LANGUAGE plpgsql
+AS $$
+--Store Procedure name: masters.GetListByTypeListCode
+--Author: David.Estepa
+--DateCreated: 29.06.23
+BEGIN
+  open result_p FOR
+  SELECT * FROM masters.ListsView
+  WHERE TypeOfListCode = TypeOfListCodeValue;
+END;
+$$;
+
+
 --INSERT VALUES
 
 --TypeOfLists
